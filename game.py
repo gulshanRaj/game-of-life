@@ -1,13 +1,11 @@
-import pygame, sys, math, copy
+import pygame, sys, math, copy, random
 from pygame.locals import *
 import numpy, pygame.sndarray
 
 class GameOfLife:
     def __init__(self):
         pass
-        self.sampleRate = 44100
-        # 44.1kHz, 16-bit signed, mono
-        pygame.mixer.pre_init(self.sampleRate, -16, 1)
+        pygame.mixer.init()
         pygame.init()
         self.width=400
         self.height=400
@@ -17,7 +15,8 @@ class GameOfLife:
         self.clock=pygame.time.Clock()
         self.screen.fill((255,255,255))
         self.State=0
-        self.sarray = [ numpy.array([4096 * numpy.sin(2.0 * numpy.pi * (300+y*2) * x / (self.sampleRate) ) for x in range(0, self.sampleRate)]).astype(numpy.int16) for y in range(1, 51)]
+        self._songs = ['a.wav', 'b.wav', 'bb.wav', 'c.wav', 'cc.wav', 'd.wav', 'e.wav', 'eb.wav', 'f.wav', 'g.wav', 'ff.wav', 'gg.wav']
+        self.num_of_channels=pygame.mixer.get_num_channels()
 
         
     def drawBoard(self):
@@ -43,8 +42,7 @@ class GameOfLife:
         
     def update(self):
         self.clock.tick(10)
-        pygame.mixer.fadeout(10)
-
+        
         # clear the screen
         self.screen.fill((255,255,255))
 
@@ -86,14 +84,20 @@ class GameOfLife:
                         if total==3:
                             self.board[x][y]=True
         pygame.display.update()
+
         if self.State==1:
-            sndar = numpy.array([0 for x in range(0, self.sampleRate)]).astype(numpy.int16)
+            address = 'piano-notes/'
+            nchannels = self.num_of_channels
             for x in range(self.width/16):
                 for y in range(x, self.height/16):
-                    if self.board[x][y] or self.board[y][x]:
-                        sndar = (sndar + self.sarray[x+y])/2
-            sound = pygame.sndarray.make_sound(sndar)
-            sound.play(1)
+                    if nchannels<=0:
+                        break
+                    if random.choice([True, False]) and self.board[x][y] or self.board[y][x]:
+                        nchannels=nchannels-1
+                        tmp = pygame.mixer.find_channel(True)
+                        sound_index = (x+y)%len(self._songs)
+                        snd = pygame.mixer.Sound(address+self._songs[sound_index])
+                        tmp.play(snd)
 
 lg=GameOfLife() #__init__ is called right here
 while 1:
