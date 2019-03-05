@@ -1,6 +1,10 @@
+import os
+from glob import glob
 import pygame, sys, math, copy, random
 from pygame.locals import *
 import numpy, pygame.sndarray
+
+
 
 class GameOfLife:
     def __init__(self):
@@ -15,7 +19,14 @@ class GameOfLife:
         self.clock=pygame.time.Clock()
         self.screen.fill((255,255,255))
         self.State=0
-        self._songs = ['a.wav', 'b.wav', 'bb.wav', 'c.wav', 'cc.wav', 'd.wav', 'e.wav', 'eb.wav', 'f.wav', 'g.wav', 'ff.wav', 'gg.wav']
+        self._songs=[]
+        PATH='/home/gulshan/Projects/gameOfLife/Loopmasters_Producer_Essentials/Keys/'
+        #self._songs = ['a.wav', 'b.wav', 'bb.wav', 'c.wav', 'cc.wav', 'd.wav', 'e.wav', 'eb.wav', 'f.wav', 'g.wav', 'ff.wav', 'gg.wav']
+        self._songs.append( [y for x in os.walk(PATH+'Rhodes_hard') for y in glob(os.path.join(x[0], '*.wav'))] )
+        self._songs.append( [y for x in os.walk(PATH+'Rhodes_Soft') for y in glob(os.path.join(x[0], '*.wav'))] )
+        self._songs.append( [y for x in os.walk(PATH+'Piano') for y in glob(os.path.join(x[0], '*.wav'))] )
+        self._songs.append( [y for x in os.walk(PATH+'Hammond') for y in glob(os.path.join(x[0], '*.wav'))] )        
+        print self._songs[0]
         self.num_of_channels=pygame.mixer.get_num_channels()
         self.ticker=0
 
@@ -89,20 +100,32 @@ class GameOfLife:
                             self.board[x][y]=True
         pygame.display.update()
 
-        if self.ticker==0 and self.State==1 and random.choice([True, False]):
-            address = 'piano-notes/'
-            nchannels = random.randint(1, self.num_of_channels)
+        if self.ticker==0 and self.State==1 : #and random.choice([True, False]):
+            #address = 'piano-notes/'
+            nchannels = self.num_of_channels
+            snd=[None for x in range(4)]
+            print snd
             for x in range(self.width/16):
-                for y in range(x, self.height/16):
+                for y in range(self.height/16):
                     if nchannels<=0:
                         break
-                    if random.choice([True, False]) and (self.board[x][y] or self.board[y][x]):
-                        nchannels=nchannels-1
-                        tmp = pygame.mixer.find_channel(True)
-                        sound_index = (x+y)%len(self._songs)
-                        snd = pygame.mixer.Sound(address+self._songs[sound_index])
-                        snd.set_volume(0.5+(x+y)/100)
-                        tmp.play(snd)
+                    if self.board[x][y]:
+                        #nchannels=nchannels-1
+                        
+                        if x >=0 and x < 7 and snd[0] is None :
+                            snd[0]=(pygame.mixer.Sound(random.choice(self._songs[0])))
+                        if x >=7 and x < 13 and snd[1] is None :
+                            snd[1]=(pygame.mixer.Sound(random.choice(self._songs[1])))
+                        if x >=13 and x < 19 and snd[2] is None :
+                            snd[2]=(pygame.mixer.Sound(random.choice(self._songs[2])))
+                        if x >=19 and x < 25 and snd[3] is None :
+                            snd[3]=(pygame.mixer.Sound(random.choice(self._songs[3])))        
+                        #snd.set_volume(0.5+(x+y)/100)
+            for z in range(4) :
+                tmp = pygame.mixer.find_channel(True)
+                if snd[z] is not None :
+                    tmp.play(snd[z])
+
 
 lg=GameOfLife() #__init__ is called right here
 while 1:
