@@ -17,6 +17,7 @@ class GameOfLife:
         self.State=0
         self._songs = ['a.wav', 'b.wav', 'bb.wav', 'c.wav', 'cc.wav', 'd.wav', 'e.wav', 'eb.wav', 'f.wav', 'g.wav', 'ff.wav', 'gg.wav']
         self.num_of_channels=pygame.mixer.get_num_channels()
+        self.ticker=0
 
         
     def drawBoard(self):
@@ -41,8 +42,11 @@ class GameOfLife:
             pygame.draw.rect(self.screen, red, (0, self.height, self.width, 10))
         
     def update(self):
-        self.clock.tick(10)
-        
+        self.clock.tick(30)
+        self.ticker = self.ticker+1
+        if self.ticker==30:
+            self.ticker=0
+
         # clear the screen
         self.screen.fill((255,255,255))
 
@@ -65,7 +69,7 @@ class GameOfLife:
         if pygame.mouse.get_pressed()[2]:
             self.State=1-self.State
 
-        if self.State==1:
+        if self.ticker==0 and self.State==1:
             num=400//16
             ar = [[0 for x in range(self.width/16)] for y in range(self.height/16)]
             for x in range(self.width/16):
@@ -85,18 +89,19 @@ class GameOfLife:
                             self.board[x][y]=True
         pygame.display.update()
 
-        if self.State==1:
+        if self.ticker==0 and self.State==1 and random.choice([True, False]):
             address = 'piano-notes/'
-            nchannels = self.num_of_channels
+            nchannels = random.randint(1, self.num_of_channels)
             for x in range(self.width/16):
                 for y in range(x, self.height/16):
                     if nchannels<=0:
                         break
-                    if random.choice([True, False]) and self.board[x][y] or self.board[y][x]:
+                    if random.choice([True, False]) and (self.board[x][y] or self.board[y][x]):
                         nchannels=nchannels-1
                         tmp = pygame.mixer.find_channel(True)
                         sound_index = (x+y)%len(self._songs)
                         snd = pygame.mixer.Sound(address+self._songs[sound_index])
+                        snd.set_volume(0.5+(x+y)/100)
                         tmp.play(snd)
 
 lg=GameOfLife() #__init__ is called right here
