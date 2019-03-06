@@ -6,3 +6,4 @@ The sounds are then mixed parallely and each generation of evolution in pattern 
 The track created can be easily modified for various sound categories given in the database and the coherence is determined via equitemporal sections, which can be extended in the future.
 
 # Screenshot
+![are you using IE](https://raw.githubusercontent.com/gulshanRaj/game-of-life/master/game_screenshot.jpeg)
