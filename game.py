@@ -26,7 +26,7 @@ class GameOfLife:
         self._songs.append( [y for x in os.walk(PATH+'Rhodes_Soft') for y in glob(os.path.join(x[0], '*.wav'))] )
         self._songs.append( [y for x in os.walk(PATH+'Piano') for y in glob(os.path.join(x[0], '*.wav'))] )
         self._songs.append( [y for x in os.walk(PATH+'Hammond') for y in glob(os.path.join(x[0], '*.wav'))] )        
-        print self._songs[0]
+        # print self._songs[0]
         self.num_of_channels=pygame.mixer.get_num_channels()
         self.ticker=0
 
@@ -55,7 +55,7 @@ class GameOfLife:
     def update(self):
         self.clock.tick(30)
         self.ticker = self.ticker+1
-        if self.ticker==30:
+        if self.ticker==15:
             self.ticker=0
 
         # clear the screen
@@ -104,7 +104,7 @@ class GameOfLife:
             #address = 'piano-notes/'
             nchannels = self.num_of_channels
             snd=[None for x in range(4)]
-            print snd
+            # print snd
             for x in range(self.width/16):
                 for y in range(self.height/16):
                     if nchannels<=0:
